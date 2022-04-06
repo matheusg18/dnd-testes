@@ -1,0 +1,33 @@
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+}
+
+.board {
+  display: flex;
+  gap: 10px;
+}
+
+.column {
+  flex: 0 0 320px;
+  padding: 16px;
+  background-color: aquamarine;
+}
+
+.column h2 {
+  margin-bottom: 16px;
+}
+
+.column ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card {
+  background-color: coral;
+  padding: 6px;
+  min-height: 40px;
+}
