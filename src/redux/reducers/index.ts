@@ -1,36 +1,55 @@
-import { board } from '../../data';
-import { ICard } from '../../interfaces';
-import { MOVE_CARD } from '../actions';
+import { board as boardData } from '../../data';
+import { ICard, IColumn } from '../../interfaces';
+import { CAN_MOVE, MOVE_CARD } from '../actions';
 
 interface IType {
   type: string;
-  payload: { card: ICard; toIndex: number };
+  payload: any;
 }
 
-const reducer = (state = board, { type, payload }: IType) => {
+type MoveCardPayload = { card: ICard; toIndex: number };
+type CanMovePayload = boolean;
+
+const reducer = (state = boardData, action: IType) => {
+  const { board, columns, cards, canMove } = state;
+  const { type, payload } = action;
+
   switch (type) {
     case MOVE_CARD: {
-      const clone = { ...state };
-      const { card, toIndex } = payload;
-      const columnIndex = clone.columns.findIndex((c) => c.id === card.columnId);
-      const changedCardsOrder = clone.columns[columnIndex].cardsOrder.reduce<number[]>(
-        (acc, id, index) => {
-          console.log(acc, id, index);
-          if (id === card.id) return acc;
-          if (index === toIndex) return [...acc, id, card.id];
-          return [...acc, id];
-        },
-        []
-      );
+      const { card, toIndex } = payload as MoveCardPayload;
+      const reduce = (acc: number[], id: number, index: number) => {
+        if (id === card.id) return acc;
+        if (index === toIndex) return [...acc, id, card.id];
+        return [...acc, id];
+      };
 
-      console.log(changedCardsOrder);
+      const map = (column: IColumn) => {
+        if (column.id === card.columnId) {
+          return { ...column, cardsOrder: column.cardsOrder.reduce(reduce, []) };
+        }
+        return column;
+      };
 
-      clone.columns[columnIndex].cardsOrder = changedCardsOrder;
+      console.log('reducer');
+      console.log('state', state);
+      console.log('action', action);
+      console.log('retorno', {
+        canMove,
+        board,
+        cards,
+        columns: columns.map(map),
+      });
 
-      console.log(clone.columns[columnIndex].cardsOrder);
-
-      return clone;
+      return {
+        canMove: true,
+        board,
+        cards,
+        columns: columns.map(map),
+      };
     }
+
+    case CAN_MOVE:
+      return { ...state, canMove: payload as CanMovePayload };
 
     default:
       return state;

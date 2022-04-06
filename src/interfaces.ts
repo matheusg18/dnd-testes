@@ -1,14 +1,19 @@
+export interface IData {
+  canMove: boolean;
+  board: IBoard;
+  columns: IColumn[];
+  cards: ICard[];
+}
+
 export interface IBoard {
   id: number;
   name: string;
-  columns: IColumn[];
   columnsOrder: number[];
 }
 
 export interface IColumn {
   id: number;
   title: string;
-  cards: ICard[];
   cardsOrder: number[];
 }
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import { ICard, IColumn } from '../interfaces';
+import { useSelector } from 'react-redux';
+import { ICard, IColumn, IData } from '../interfaces';
 import Card from './card';
 
 type PropTypes = {
@@ -7,15 +8,14 @@ type PropTypes = {
 };
 
 function Column({ columnData }: PropTypes) {
+  const { cards } = useSelector<IData, IData>((state) => state);
+
   return (
     <div className="column">
-      <h2>{columnData?.title}</h2>
+      <h2>{columnData.title}</h2>
       <ul>
-        {columnData?.cardsOrder.map((id) => (
-          <Card
-            key={`card-${id}`}
-            cardData={columnData.cards.find((card) => card.id === id) as ICard}
-          />
+        {columnData.cardsOrder.map((id) => (
+          <Card key={`card-${id}`} cardData={cards.find((card) => card.id === id) as ICard} />
         ))}
       </ul>
     </div>

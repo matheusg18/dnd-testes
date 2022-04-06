@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { useDrag, useDrop, XYCoord } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
-import { IBoard, ICard, IColumn } from '../interfaces';
+import { ICard, IColumn, IData } from '../interfaces';
 import { moveCard } from '../redux/actions';
 
 type PropType = {
@@ -9,14 +9,14 @@ type PropType = {
 };
 
 function Card({ cardData }: PropType) {
-  const board = useSelector<IBoard, IBoard>((state) => state);
+  const { columns, cards, canMove } = useSelector<IData, IData>((state) => state);
   const dispatch = useDispatch();
 
   const ref = useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, dragRef] = useDrag({
     type: 'CARD',
-    item: { id: cardData?.id, columnId: cardData?.columnId },
+    item: { id: cardData.id, columnId: cardData.columnId },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -26,12 +26,12 @@ function Card({ cardData }: PropType) {
     accept: 'CARD',
     hover(item, monitor) {
       if (!ref.current) return;
-      if (item.id === cardData?.id) return;
+      if (item.id === cardData.id) return;
 
-      const dragColumn = board.columns.find((column) => column.id === item.columnId) as IColumn;
+      const dragColumn = columns.find((column) => column.id === item.columnId) as IColumn;
       const dragIndex = dragColumn.cardsOrder.findIndex((id) => id === item.id);
 
-      const hoverColumn = board.columns.find((column) => column.id === cardData.columnId) as IColumn;
+      const hoverColumn = columns.find((column) => column.id === cardData.columnId) as IColumn;
       const hoverIndex = hoverColumn.cardsOrder.findIndex((id) => id === cardData.id);
 
       if (dragIndex < 0 || hoverIndex < 0) return;
@@ -45,11 +45,13 @@ function Card({ cardData }: PropType) {
 
       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
       if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
+      // if (!canMove) return;
 
       // console.log('hover', hoverMiddleY, hoverClientY);
+      // dispatch({ type: 'CAN_MOVE', payload: false });
 
       dispatch(moveCard({
-        card: dragColumn.cards.find((c) => c.id === item.id) as ICard,
+        card: cards.find((c) => c.id === item.id) as ICard,
         toIndex: hoverIndex,
       }));
 
@@ -62,7 +64,7 @@ function Card({ cardData }: PropType) {
 
   return (
     <div ref={ref} className="card" style={{ opacity: isDragging ? 0 : 1 }}>
-      {cardData?.content}
+      {cardData.content}
     </div>
   );
 }
